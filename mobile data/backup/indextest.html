@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skid Packing Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f2f2f2; }
+    .summary-cards div { background: white; padding: 10px; margin: 5px; border-radius: 10px; display: inline-block; min-width: 200px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .export-buttons button { padding: 8px 16px; margin-right: 10px; border: none; background: #1976d2; color: white; border-radius: 5px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: center; }
+    select { padding: 6px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>📦 Skid Packing Summary Dashboard</h2>
+
+  <!-- ✅ Summary Cards -->
+  <div class="summary-cards">
+    <div>Total Boxes: <span id="summary-boxes">0</span></div>
+    <div>Total Pallets: <span id="summary-pallets">0</span></div>
+    <div>Total Weight: <span id="summary-weight">0 kg</span></div>
+    <div>Total Volume: <span id="summary-volume">0 ft³</span></div>
+  </div>
+
+  <!-- ✅ Export / Print Buttons -->
+  <div class="export-buttons">
+    <button onclick="exportVisibleTableToExcel()">Export Filtered to Excel</button>
+    <button onclick="printFilteredView()">Print Filtered View</button>
+  </div>
+
+  <!-- ✅ 3D Pallet View Selector -->
+  <div>
+    <label><b>Select Pallet for 3D View:</b></label>
+    <select onchange="showPallet3DView(this.value)">
+      <option value="">-- Select --</option>
+      <option value="1">Pallet 1</option>
+      <option value="2">Pallet 2</option>
+      <option value="3">Pallet 3</option>
+    </select>
+  </div>
+
+  <!-- ✅ 3D Pallet Container -->
+  <div id="pallet-3d-container" style="width: 100%; height: 400px; background: #e0e0e0; margin-top: 10px; border-radius: 8px;">
+    <!-- 3D Canvas Rendered Here -->
+  </div>
+
+  <!-- ✅ Data Table -->
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Box No</th>
+        <th>Company</th>
+        <th>Weight</th>
+        <th>Length</th>
+        <th>Breadth</th>
+        <th>Height</th>
+        <th>Pallet</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Add rows dynamically -->
+    </tbody>
+  </table>
+
+  <script>
+    function updateSummaryCards(data) {
+      let totalBoxes = data.length;
+      let totalPallets = new Set(data.map(item => item.pallet)).size;
+      let totalWeight = 0;
+      let totalVolume = 0;
+
+      data.forEach(item => {
+        const w = parseFloat(item.weight) || 0;
+        const l = parseFloat(item.length) || 0;
+        const b = parseFloat(item.breadth) || 0;
+        const h = parseFloat(item.height) || 0;
+
+        totalWeight += w;
+        totalVolume += l * b * h;
+      });
+
+      document.getElementById("summary-boxes").innerText = totalBoxes;
+      document.getElementById("summary-pallets").innerText = totalPallets;
+      document.getElementById("summary-weight").innerText = totalWeight.toFixed(2) + " kg";
+      document.getElementById("summary-volume").innerText = totalVolume.toFixed(2) + " ft³";
+    }
+
+    function showPallet3DView(palletNumber) {
+      const container = document.getElementById("pallet-3d-container");
+      container.innerHTML = "<p style='padding:20px;'>🧱 3D View for Pallet " + palletNumber + " will appear here (Three.js placeholder)</p>";
+    }
+
+    function exportVisibleTableToExcel(tableId = "data-table") {
+      const table = document.getElementById(tableId);
+      const clone = table.cloneNode(true);
+
+      Array.from(clone.querySelectorAll("tr")).forEach(row => {
+        if (row.style.display === "none") row.remove();
+      });
+
+      let html = clone.outerHTML;
+      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Filtered_SkidPacking.xls";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function printFilteredView() {
+      const table = document.getElementById("data-table").cloneNode(true);
+
+      Array.from(table.querySelectorAll("tr")).forEach(row => {
+        if (row.style.display === "none") row.remove();
+      });
+
+      const printable = `<html><head><title>Print View</title></head><body>${table.outerHTML}</body></html>`;
+      const win = window.open("", "", "height=700,width=900");
+      win.document.write(printable);
+      win.document.close();
+      win.print();
+    }
+
+    // Dummy Data For Testing
+    const dummyData = [
+      { box: "BX001", company: "A COY", weight: 200, length: 2, breadth: 2, height: 2, pallet: 1 },
+      { box: "BX002", company: "B COY", weight: 300, length: 3, breadth: 2, height: 2, pallet: 2 },
+      { box: "BX003", company: "C COY", weight: 250, length: 2, breadth: 3, height: 2, pallet: 1 },
+    ];
+
+    function loadDummy() {
+      const tbody = document.querySelector("#data-table tbody");
+      tbody.innerHTML = "";
+      dummyData.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${item.box}</td><td>${item.company}</td><td>${item.weight}</td><td>${item.length}</td><td>${item.breadth}</td><td>${item.height}</td><td>${item.pallet}</td>`;
+        tbody.appendChild(row);
+      });
+      updateSummaryCards(dummyData);
+    }
+
+    window.onload = loadDummy;
+  </script>
+</body>
+</html>

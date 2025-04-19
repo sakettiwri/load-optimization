@@ -1,0 +1,209 @@
+<!-- File: index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skid Packing System - VIP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<h2>📦 Manual Box Entry</h2>
+<button id="add-manual-entry">➕ Add New Entry</button>
+<button id="clear-manual-entry">🗑️ Clear All</button>
+<button onclick="exportToExcel()">Export Excel</button>
+<button onclick="exportToPDF()">Export PDF</button>
+<button onclick="printView()">🖨️ Print View</button>
+<input type="text" id="search-box" placeholder="🔍 Search by box no, company or pallet" style="margin-bottom:10px; padding:5px; width: 300px;" />
+<script>setupSmartSearch();</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script> <script src="pallet_3d.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<table id="manual-entry-table" border="1">
+  <thead>
+    <tr>
+      <th>Box#</th><th>Company</th><th>Module</th><th>SubModule</th>
+      <th>Length</th><th>Width</th><th>Height</th><th>Weight</th><th>Action</th>
+    </tr>
+  </thead>
+</table>
+
+<div id="manual-data-display" style="margin-top: 1rem;"></div>
+<h3>🧊 3D Box Layout</h3>
+<div id="pallet-3d-view" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
+
+
+<body>
+  <header>
+    <h1>Skid Packing Optimization System</h1>
+    <p id="clock"></p>
+  </header>
+  <div id="live-date" style="font-weight: bold;"></div>
+<div id
+
+  <section class="controls">
+    <input type="file" id="csvUpload" accept=".csv" />
+    <button onclick="exportToExcel()">Export Excel</button>
+    <button onclick="window.print()">Print</button>
+    <button onclick="saveDataToLocalStorage()">💾 Save Data</button>
+    <button onclick="resetAllData()">🗑️ Reset Data</button>
+    
+    
+
+  </section>
+
+  <section class="filters">
+    <h3>Modules:</h3>
+    <div id="moduleFilters"></div>
+  </section>
+
+  <body onload="loadDataFromLocalStorage()">
+
+  <section>
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Box No</th>
+          <th>Company</th>
+          <th>Length (ft)</th>
+          <th>Width (ft)</th>
+          <th>Height (ft)</th>
+          <th>Weight (kg)</th>
+          <th>Pallet</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+  // 📁 File: summary.js
+  function updateSummaryCards(data) {
+    let totalBoxes = data.length;
+    let totalPallets = new Set(data.map(item => item.pallet)).size;
+    let totalWeight = 0;
+    let totalVolume = 0;
+  
+    data.forEach(item => {
+      const w = parseFloat(item.weight) || 0;
+      const l = parseFloat(item.length) || 0;
+      const b = parseFloat(item.breadth) || 0;
+      const h = parseFloat(item.height) || 0;
+  
+      totalWeight += w;
+      totalVolume += l * b * h;
+    });
+  
+    document.getElementById("summary-boxes").innerText = totalBoxes;
+    document.getElementById("summary-pallets").innerText = totalPallets;
+    document.getElementById("summary-weight").innerText = totalWeight.toFixed(2) + " kg";
+    document.getElementById("summary-volume").innerText = totalVolume.toFixed(2) + " ft³";
+  }
+  
+  // 📁 File: pallet_3d_viewer.js
+  function showPallet3DView(palletNumber) {
+    const container = document.getElementById("pallet-3d-container");
+    container.innerHTML = "";
+    init3DSceneForPallet(palletNumber);
+  }
+  
+  function init3DSceneForPallet(palletNumber) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(500, 500);
+    document.getElementById("pallet-3d-container").appendChild(renderer.domElement);
+  
+    const light = new THREE.PointLight(0xffffff);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+  
+    const palletData = window.boxData.filter(b => b.pallet === palletNumber);
+    palletData.forEach((box, i) => {
+      const geometry = new THREE.BoxGeometry(box.length, box.height, box.breadth);
+      const material = new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff });
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(i * 10, box.height / 2, 0);
+      scene.add(cube);
+    });
+  
+    camera.position.z = 100;
+    renderer.render(scene, camera);
+  }
+  
+  // 📁 File: export_filtered.js
+  function exportVisibleTableToExcel(tableId = "data-table") {
+    const table = document.getElementById(tableId);
+    const clone = table.cloneNode(true);
+  
+    Array.from(clone.querySelectorAll("tr")).forEach(row => {
+      if (row.style.display === "none") row.remove();
+    });
+  
+    let html = clone.outerHTML;
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Filtered_SkidPacking.xls";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  
+  function printFilteredView() {
+    const original = document.body.innerHTML;
+    const table = document.getElementById("data-table").cloneNode(true);
+  
+    Array.from(table.querySelectorAll("tr")).forEach(row => {
+      if (row.style.display === "none") row.remove();
+    });
+  
+    const printable = `<html><head><title>Print View</title></head><body>${table.outerHTML}</body></html>`;
+    const win = window.open("", "", "height=700,width=900");
+    win.document.write(printable);
+    win.document.close();
+    win.print();
+  }
+  
+  // 📁 File: smart_search.js
+  function applySmartSearchFilter() {
+    const searchBox = document.getElementById("smart-search").value.toLowerCase();
+    const table = document.getElementById("data-table");
+    const rows = table.getElementsByTagName("tr");
+    for (let i = 1; i < rows.length; i++) {
+      const rowText = rows[i].innerText.toLowerCase();
+      rows[i].style.display = rowText.includes(searchBox) ? "" : "none";
+    }
+  }
+  <section class="canvas-section">
+    <h3>3D Pallet Layout</h3>
+    <div id="threeDContainer"></div>
+  </section>
+  <h3>📦 Pallet Box Layout Preview</h3>
+  <canvas id="pallet-canvas" style="border: 1px solid #ccc;"></canvas>
+  const pallets = generatePalletsFromData(manualEntries);
+init3DLayout(pallets);
+
+  
+  <footer>
+    <p>Designed by Hav Ritesh</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+  <script src="script.js"></script>
+  <script src="module_config.js"></script>
+  <div id="module-filters"></div>
+  <script src="manual_entry.js"></script>
+  <script src="pallet_canvas.js"></script>
+  <script src="export.js"></script>
+  <script src="print_preview.js"></script>
+  <script src="search_filter.js"></script>
+  <script src="data_storage.js"></script>
+  
+
+ </body>
+</html>
