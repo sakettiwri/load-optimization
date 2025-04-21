@@ -1,0 +1,138 @@
+/* style.css - VIP Skid Packing System */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+header {
+  background-color: #003366;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  height: 50px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+#clock {
+  font-size: 18px;
+}
+
+main {
+  padding: 20px;
+}
+
+.controls button,
+.filters button {
+  margin: 5px;
+  padding: 10px 15px;
+  border: none;
+  background-color: #006699;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.controls button:hover,
+.filters button:hover {
+  background-color: #004466;
+}
+
+#csvFileInput {
+  margin: 5px;
+  padding: 5px;
+}
+
+.filters {
+  margin-top: 15px;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.summary {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.summary div {
+  flex: 1;
+  font-weight: bold;
+}
+
+.content {
+  display: flex;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.data-table {
+  flex: 1;
+  overflow-x: auto;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.data-table th {
+  background-color: #eee;
+}
+
+.visualization {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#threeCanvas {
+  width: 100%;
+  height: 600px;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+}
+
+#palletSelect {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+footer {
+  margin-top: 30px;
+  background-color: #003366;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+}

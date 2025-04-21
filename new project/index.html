@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Load Optimization System - VIP Skid Packing</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/indian-army-logo.png" />
+</head>
+<body>
+    <!-- Inside your body tag -->
+<section class="controls">
+    <input type="file" id="csvFileInput" accept=".csv" onchange="readCSVFile(this.files[0])" />
+    <button id="importCSVBtn">Import CSV</button>
+    <button id="exportBtn">Export to Excel</button>
+    <button id="printBtn">Print View</button>
+    <button id="resetBtn">Reset</button>
+  </section>
+  
+  <section class="filters">
+    <button id="selectAllModules">Select All</button>
+    <button id="unselectAllModules">Unselect All</button>
+    <div id="moduleFilters"></div>
+    <div id="subModuleFilters"></div>
+  </section>
+  
+  <section class="summary">
+    <div>Total Pallets: <span id="totalPallets"></span></div>
+    <div>Total Weight: <span id="totalWeight"></span></div>
+    <div>Total Volume: <span id="totalVolume"></span></div>
+    <div>Utilization: <span id="utilization"></span>%</div>
+  </section>
+  
+  <header>
+    <img src="assets/indian-army-logo.png" alt="Logo" class="logo">
+    <h1>Load Optimization System - VIP Skid Packing</h1>
+    <div id="clock"></div>
+  </header>
+
+  <main>
+    <!-- Controls -->
+    <section class="controls">
+      <input type="file" id="csvFileInput" accept=".csv" />
+      <button id="importCSVBtn">Import CSV</button>
+      <button id="exportBtn">Export to Excel</button>
+      <button id="printBtn">Print View</button>
+      <button id="resetBtn">Reset</button>
+    </section>
+<!-- Module Filter -->
+<section class="filters">
+    <button id="selectAllModules">Select All</button>
+    <button id="unselectAllModules">Unselect All</button>
+    <div id="moduleFilters"></div>
+    <div id="subModuleFilters"></div>
+  </section>
+  
+  <!-- Summary Section -->
+  <section class="summary">
+    <div>Total Pallets: <span id="totalPallets"></span></div>
+    <div>Total Boxes: <span id="totalBoxes"></span></div>
+    <div>Total Weight: <span id="totalWeight"></span></div>
+    <div>Total Volume: <span id="totalVolume"></span></div>
+    <div>Utilization: <span id="utilization"></span>%</div>
+  </section>
+  
+    <!-- Filters -->
+    <section class="filters">
+      <button id="selectAllModules">Select All</button>
+      <button id="unselectAllModules">Unselect All</button>
+      <div id="moduleFilters"></div>
+      <div id="subModuleFilters"></div>
+    </section>
+
+    <!-- Summary -->
+    <section class="summary">
+      <div>Total Pallets: <span id="totalPallets">0</span></div>
+      <div>Total Boxes: <span id="totalBoxes">0</span></div>
+      <div>Total Weight: <span id="totalWeight">0 kg</span></div>
+      <div>Total Volume: <span id="totalVolume">0 ft³</span></div>
+      <div>Utilization: <span id="utilization">0</span>%</div>
+    </section>
+
+    <!-- Content: Table + 3D View -->
+    <section class="content">
+      <div class="data-table">
+        <table id="dataTable"></table>
+      </div>
+      <div class="visualization">
+        <label for="palletSelect">Select Pallet:</label>
+        <select id="palletSelect"></select>
+        <canvas id="threeCanvas"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>Designed by Hav Ritesh | Version 1.0</p>
+  </footer>
+
+  <!-- JavaScript Files -->
+  <script src="js/functions.js"></script>
+  <script src="js/modules.js"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/three-visual.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
